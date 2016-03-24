@@ -13,7 +13,8 @@ cd ../mumo/modules-available && ln -s ../../mumo-modules/setstatus.ini && cd -
 cd ../mumo/modules-available && ln -s ../../mumo-modules/urltoimg.ini && cd -
 
 echo "Creating links for modules-enabled"
-cd ../mumo/modules-enabled && ln -s ../../mumo-modules/bot.ini && cd -
-cd ../mumo/modules-enabled && ln -s ../../mumo-modules/dbintegrate.ini && cd -
-cd ../mumo/modules-enabled && ln -s ../../mumo-modules/setstatus.ini && cd -
-cd ../mumo/modules-enabled && ln -s ../../mumo-modules/urltoimg.ini && cd -
+cd ../mumo/modules-enabled && ln -s ../modules-available/bot.ini && cd -
+cd ../mumo/modules-enabled && ln -s ../modules-available/dbintegrate.ini && cd -
+cd ../mumo/modules-enabled && ln -s ../modules-available/setstatus.ini && cd -
+cd ../mumo/modules-enabled && ln -s ../modules-available/urltoimg.ini && cd -
+cd ../mumo/modules-enabled && ln -s ../modules-available/seen.ini && cd -

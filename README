@@ -1,0 +1,39 @@
+INSTALLATION DETAILS FOR UBUNTU 14.04
+=====================================
+Install Mumble/Murmur
+    sudo add-apt-repository ppa:mumble/release
+    sudo apt-get update
+
+    sudo apt-get install mumble (optional)
+
+    sudo apt-get install mumble-server
+    sudo dpkg-reconfigure mumble-server
+
+Install Ice 
+    wget https://zeroc.com/download/RPM-GPG-KEY-zeroc-release
+    sudo apt-key add RPM-GPG-KEY-zeroc-release 
+
+    cd /etc/apt/sources.list.d
+    sudo wget https://zeroc.com/download/Ice/3.5/ubuntu/ice3.5-trusty.list
+    sudo apt-get update 
+
+    sudo apt-get install ice icebox/trusty-zeroc icegrid/trusty-zeroc 
+
+    sudo apt-get install ice-dev 
+
+    sudo apt-get install python-zeroc-ice
+    sudo apt-get install python-daemon
+
+Install beautifulsoup
+    sudo apt-get install python-beautifulsoup
+
+Install easy_install
+    wget https://bootstrap.pypa.io/ez_setup.py -O - | python
+
+Install isodate module
+    easy_install isodate
+
+References:
+    Ice > https://zeroc.com/download.html#linux
+    mumo > http://wiki.natenom.com/w/Mumble_Moderator/Install
+  

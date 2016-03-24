@@ -38,7 +38,10 @@ from mumo_module import (commaSeperatedIntegers,
                          MumoModule)
 
 from datetime import timedelta
-import urllib, base64, re
+import urllib, base64, re, psycopg2
+
+# Need to create dbdetails.py file
+from dbdetails import dbname, dbuser, dbpass
 
 
 class dbintegrate(MumoModule):
@@ -90,4 +93,4 @@ def updateUsers(server):
     users = server.getUsers()
     channels = server.getChannels()
     for u in users.values():
-        print u.name, channels[u.channel].name
+        print u.userid, u.name, u.channel, channels[u.channel].name

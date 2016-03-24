@@ -74,9 +74,9 @@ class dbintegrate(MumoModule):
     
     def userTextMessage(self, server, user, message, current=None): pass
 
-    def userConnected(self, server, state, context = None): 
+    def userConnected(self, server, state, context = None):
         updateUsers(server)
-    def userDisconnected(self, server, state, context = None): pass
+    def userDisconnected(self, server, state, context = None):
         updateUsers(server)
     def userStateChanged(self, server, state, context = None):
         updateUsers(server)

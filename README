@@ -32,6 +32,9 @@ Install easy_install
 
 Install isodate module
     easy_install isodate
+   
+Creating symbolic links
+    cd mumo/modules-available && ln -s ../../mumo-modules/XXX.ini && cd -
 
 References:
     Ice > https://zeroc.com/download.html#linux

@@ -55,6 +55,10 @@ class dbintegrate(MumoModule):
         MumoModule.__init__(self, name, manager, configuration)
         self.murmur = manager.getMurmurModule()
         self.keyword = self.cfg().dbintegrate.keyword
+        try:
+            self.conn = psycopg2.connect("dbname=dbname user=dbuser host='localhost' password=dbpass") 
+        except:
+            "Couldn't connect to the db."
 
     def connected(self):
         manager = self.manager()

@@ -56,9 +56,10 @@ class dbintegrate(MumoModule):
         self.murmur = manager.getMurmurModule()
         self.keyword = self.cfg().dbintegrate.keyword
         try:
-            self.conn = psycopg2.connect("dbname=dbname user=dbuser host='localhost' password=dbpass") 
+            self.conn= psycopg2.connect("dbname="+dbname+" user="+dbuser+" host='localhost' password="+dbpass)
+            self.cur = self.conn.cursor()
         except:
-            "Couldn't connect to the db."
+            print "Couldn't connect to the db."
 
     def connected(self):
         manager = self.manager()
@@ -82,19 +83,35 @@ class dbintegrate(MumoModule):
     def userTextMessage(self, server, user, message, current=None): pass
 
     def userConnected(self, server, state, context = None):
-        updateUsers(server)
+        self.updateUsers(server)
     def userDisconnected(self, server, state, context = None):
-        updateUsers(server)
+        self.updateUsers(server)
     def userStateChanged(self, server, state, context = None):
-        updateUsers(server)
+        self.updateUsers(server)
 
     def channelCreated(self, server, state, context = None): pass
     def channelRemoved(self, server, state, context = None): pass
     def channelStateChanged(self, server, state, context = None): pass
 
-def updateUsers(server):
-    # Get users
-    users = server.getUsers()
-    channels = server.getChannels()
-    for u in users.values():
-        print u.userid, u.name, u.channel, channels[u.channel].name
+    def updateUsers(self, server):
+        # Get users
+        users = server.getUsers()
+        channels = server.getChannels()
+
+        # Step through each user
+        for user in users.values():
+            insert_user = "INSERT INTO mumblewebapp_user (userid, username) VALUES ("+str(user.userid)+", '"+user.name+"');"
+#insert_user = "INSERT INTO mumblewebapp_user (userid, username) VALUES ("+str(user.userid)+", '"+user.name+"') ON CONFLICT (userid) DO NOTHING;"
+            print "id=",user.userid, 
+            print "name=",user.name, 
+            print "channel=",user.channel, channels[user.channel].name
+            try:
+                print "succ", insert_user
+                self.cur.execute(insert_user)
+                self.conn.commit();
+                print self.cur
+                print "successful insert"
+            except:
+                print "Couldn't insert record", user.userid, user.name, user.channel, channels[user.channel].name
+                print "fail", insert_user
+        

@@ -9,3 +9,16 @@ ehthumbs.db
 Thumbs.db
 key.py
 *~
+__init__.py
+bf2.py
+idlemove.py
+onjoin.py
+samplecontext.py
+seen.py
+test.py
+db.py
+db_test.py
+source.py
+source_test.py
+users.py
+users_test.py

@@ -100,18 +100,18 @@ class dbintegrate(MumoModule):
 
         # Step through each user
         for user in users.values():
-            insert_user = "INSERT INTO mumblewebapp_user (userid, username) VALUES ("+str(user.userid)+", '"+user.name+"');"
-#insert_user = "INSERT INTO mumblewebapp_user (userid, username) VALUES ("+str(user.userid)+", '"+user.name+"') ON CONFLICT (userid) DO NOTHING;"
-            print "id=",user.userid, 
-            print "name=",user.name, 
-            print "channel=",user.channel, channels[user.channel].name
+            insert_user = "INSERT INTO mumblewebapp_user (userid, username) VALUES ("+str(user.userid)+", '"+user.name+"') ON CONFLICT (userid) DO NOTHING;"
+            #print "id=",user.userid, 
+            #print "name=",user.name, 
+            #print "channel=",user.channel, channels[user.channel].name
             try:
-                print "succ", insert_user
                 self.cur.execute(insert_user)
                 self.conn.commit();
-                print self.cur
-                print "successful insert"
-            except:
-                print "Couldn't insert record", user.userid, user.name, user.channel, channels[user.channel].name
-                print "fail", insert_user
+                #print self.cur
+                #print "successfully inserted row!"
+            except psycopg2.Error as exp:
+                #print "Couldn't insert record", user.userid, user.name, user.channel, channels[user.channel].name
+                print exp
+            #print insert_user
+            #print 
         

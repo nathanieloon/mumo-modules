@@ -84,49 +84,56 @@ class dbintegrate(MumoModule):
 
     def userConnected(self, server, state, context = None):
         self.updateUsers(state)
+        update_status = "UPDATE mumblewebapp_user SET online=True WHERE userid="+str(state.userid)+";"
+
+        # Make changes 
+        self.commitChanges([update_status])
+
     def userDisconnected(self, server, state, context = None):
-        self.updateUsers(state)
+        #self.updateUsers(state)
+        update_status = "UPDATE mumblewebapp_user SET online=False WHERE userid="+str(state.userid)+";"
+
+        # Make changes 
+        self.commitChanges([update_status])
+
     def userStateChanged(self, server, state, context = None):
         self.updateUsers(state)
 
     def channelCreated(self, server, state, context = None):
         # Query to insert channel into database
-        insert_channel = "INSERT INTO mumblewebapp_channel (channelid, parentid, channelname) VALUES ("+str(state.id)+", '"+str(state.parent)+"', '"+state.name+"') ON CONFLICT (channelid) DO NOTHING;"
-        try: # Try to insert the channel, throw an exception if we can't
-            self.cur.execute(insert_channel);
-            self.conn.commit();
-        except psycopg2.Error as exp:
-            print exp
+        insert_channel = "INSERT INTO mumblewebapp_channel (channelid, parentid, channelname) VALUES ("+str(state.id)+", "+str(state.parent)+", '"+state.name+"') ON CONFLICT (channelid) DO NOTHING;"
+#        insert_channel_rel = "INSERT INTO mumblewebapp_channelrel (channelfk_id, childfk_id) VALUES ("+str(state.parent)+", "+str(state.id)+") ON CONFLICT (childfk_id) DO UPDATE SET channelfk_id="+str(state.parent)+";"
+
+        # Make changes
+        self.commitChanges([insert_channel])
 
     def channelRemoved(self, server, state, context = None):
         # Query to delete channel into database
-        insert_channel = "DELETE FROM mumblewebapp_channel WHERE channelid="+str(state.id)+";"
-        try: # Try to delete the channel, throw an exception if we can't
-            self.cur.execute(insert_channel);
-            self.conn.commit();
-        except psycopg2.Error as exp:
-            print exp
+        delete_channel = "DELETE FROM mumblewebapp_channel WHERE channelid="+str(state.id)+";"
+        self.commitChanges([delete_channel])
         
-    def channelStateChanged(self, server, state, context = None): 
+    def channelStateChanged(self, server, state, context = None):
         # Query to insert/update channel into database
-        insert_channel = "INSERT INTO mumblewebapp_channel (channelid, parentid, channelname) VALUES ("+str(state.id)+", '"+str(state.parent)+"', '"+state.name+"') ON CONFLICT (channelid) DO UPDATE SET parentid = "+str(state.parent)+", channelname='"+str(state.name)+"';"
-        try: # Try to insert the channel, throw an exception if we can't
-            self.cur.execute(insert_channel);
-            self.conn.commit();
-        except psycopg2.Error as exp:
-            print exp
-
+        merge_channel = "INSERT INTO mumblewebapp_channel (channelid, parentid, channelname) VALUES ("+str(state.id)+", "+str(state.parent)+", '"+state.name+"') ON CONFLICT (channelid) DO UPDATE SET parentid="+str(state.parent)+", channelname='"+state.name+"';"
+#        merge_channel_rel = "INSERT INTO mumblewebapp_channelrel (channelfk_id, childfk_id) VALUES ("+str(state.parent)+", "+str(state.id)+") ON CONFLICT (childfk_id) DO UPDATE SET channelfk_id="+str(state.parent)+";"
+        # Make changes
+        self.commitChanges([merge_channel])
+    
     def updateUsers(self, state):
-        # Query to insert user into database
-        insert_user = "INSERT INTO mumblewebapp_user (userid, username) VALUES ("+str(state.userid)+", '"+state.name+"') ON CONFLICT (userid) DO NOTHING;"
-        # Query to inser to userchannel
-        insert_userchannel = "INSERT INTO mumblewebapp_userchannel (uid_id, cid_id) VALUES ("+str(state.userid)+", '"+str(state.channel)+"') ON CONFLICT (uid_id) DO UPDATE SET uid_id="+str(state.userid)+", cid_id="+str(state.channel)+";"
+        if state.userid is not -1:
+            # Query to insert user into database
+            insert_user = "INSERT INTO mumblewebapp_user (userid, username, online) VALUES ("+str(state.userid)+", '"+state.name+"', True) ON CONFLICT (userid) DO NOTHING;"
+            # Query to insert to userchannel
+            insert_userchannel = "INSERT INTO mumblewebapp_userchannel (uid_id, cid_id) VALUES ("+str(state.userid)+", '"+str(state.channel)+"') ON CONFLICT (uid_id) DO UPDATE SET uid_id="+str(state.userid)+", cid_id="+str(state.channel)+";"
 
-        try: # Try to insert the user, throw an exception if we can't
-            self.cur.execute(insert_user)
-            self.cur.execute(insert_userchannel)
-            
-            self.conn.commit();
-        except psycopg2.Error as exp:
-            print exp
-         
+            # Make changes
+            self.commitChanges([insert_user, insert_userchannel])
+
+    def commitChanges(self, queries):
+        try: # Commit our changes made
+            for q in queries:
+                print "executing", q
+                self.cur.execute(q)
+            self.conn.commit()
+        except psycopg2.Error as exc:
+            print exc

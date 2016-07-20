@@ -269,7 +269,7 @@ class bot(MumoModule):
             video_id = youtube_regex_match.group(6)
             youtube_info = "https://www.googleapis.com/youtube/v3/videos?part=snippet,contentDetails&id="+video_id+"&key="+api_key
             #print "API URL:", youtube_info
-            youtube_json = json.load(urllib2.urlopen(youtube_info))
+            youtube_json = json.load(urllib.urlopen(youtube_info))
             #print "JSON:", youtube_json
             #print "test", youtube_json['items'][0]['snippet']['title']
             video_duration = youtube_json['items'][0]['contentDetails']['duration']

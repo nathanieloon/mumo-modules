@@ -31,6 +31,14 @@ def strip_tags(html):
     s.feed(html)
     return s.get_data()
 
+
+class YoutubeException(Exception):
+    def __init__(self, payload, msg=None):
+        if not msg:
+            self.msg = "An error occurred with the YouTube API. It's probably an issue with your key. RETURN: {0}".format(payload)
+        Exception.__init__(self, self.msg)
+
+
 class bot(MumoModule):
     default_config = {'bot':(
                                 ('servers', commaSeperatedIntegers, []),
@@ -269,17 +277,19 @@ class bot(MumoModule):
             video_id = youtube_regex_match.group(6)
             youtube_info = "https://www.googleapis.com/youtube/v3/videos?part=snippet,contentDetails&id="+video_id+"&key="+api_key
             #print "API URL:", youtube_info
-            youtube_json = json.load(urllib.urlopen(youtube_info))
-            #print "JSON:", youtube_json
-            #print "test", youtube_json['items'][0]['snippet']['title']
-            video_duration = youtube_json['items'][0]['contentDetails']['duration']
-            print "DURATION", video_duration
-	    print "TIME TEST", isodate.parse_duration(video_duration)
-
-	    video_time = isodate.parse_duration(video_duration)
-
-            video_title = youtube_json['items'][0]['snippet']['title']
-            video_thumb = youtube_json['items'][0]['snippet']['thumbnails']['high']['url']
+            try:
+                youtube_json = json.load(urllib.urlopen(youtube_info))
+                #print "JSON:", youtube_json
+                #print "test", youtube_json['items'][0]['snippet']['title']
+                if 'items' not in youtube_json:
+                    raise YoutubeException(youtube_json)
+                video_duration = youtube_json['items'][0]['contentDetails']['duration']
+                video_time = isodate.parse_duration(video_duration)
+                video_title = youtube_json['items'][0]['snippet']['title']
+                video_thumb = youtube_json['items'][0]['snippet']['thumbnails']['high']['url']
+            except YoutubeException:
+                raise
+                
             youtube_template = '<br/><a href="https://youtu.be/{0}">{1} ({2})</a>\
                                 <a href="https://youtu.be/{3}"><img src="{4}" \
                                 width="250"/></a>'\
